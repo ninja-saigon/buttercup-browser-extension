@@ -16,6 +16,7 @@ export const DROPBOX_SET_AUTH_TOKEN = "dropbox/setAuthToken";
 export const MYBUTTERCUP_CLEAR_STATE = "mybuttercup/clear";
 export const MYBUTTERCUP_SET_AUTH_ID = "mybuttercup/setAuthenticationID";
 export const MYBUTTERCUP_SET_AUTH_TOKEN = "mybuttercup/setAuthToken";
+export const MYBUTTERCUP_SET_ORGS = "mybuttercup/setOrganisations";
 
 export const SEARCH_SET_ENTRY_RESULTS = "searching/results/set";
 export const SEARCH_SET_SOURCES_COUNT = "searching/setSources";
