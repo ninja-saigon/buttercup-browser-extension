@@ -31,8 +31,14 @@ import {
 } from "../library/archives.js";
 import { setBusy, unsetBusy } from "../../shared/actions/app.js";
 import { performAuthentication as performDropboxAuthentication } from "../library/dropbox.js";
-import { setAuthID } from "../../shared/actions/dropbox.js";
+import { performAuthentication as performMyButtercupAuthentication } from "../library/myButtercup.js";
+import { setAuthID as setDropboxAuthID } from "../../shared/actions/dropbox.js";
 import { getAuthID as getDropboxAuthID, getAuthToken as getDropboxAuthToken } from "../../shared/selectors/dropbox.js";
+import { setAuthID as setMyButtercupAuthID } from "../../shared/actions/myButtercup.js";
+import {
+    getAuthID as getMyButtercupAuthID,
+    getAuthToken as getMyButtercupAuthToken
+} from "../../shared/selectors/mybuttercup.js";
 import { closeCurrentTab } from "../../shared/library/extension.js";
 import {
     createNewClient as createLocalClient,
@@ -49,6 +55,8 @@ export default connect(
         localAuthStatus: getLocalAuthStatus(state),
         isConnected: isConnected(state),
         isConnecting: isConnecting(state),
+        myButtercupAuthID: getMyButtercupAuthID(state),
+        myButtercupAuthToken: getMyButtercupAuthToken(state),
         selectedArchiveType: getSelectedArchiveType(state),
         selectedFilename: getSelectedFilename(state),
         selectedFilenameNeedsCreation: selectedFileNeedsCreation(state)
@@ -72,8 +80,12 @@ export default connect(
                 });
         },
         onAuthenticateDropbox: dropboxAuthID => dispatch => {
-            dispatch(setAuthID(dropboxAuthID));
+            dispatch(setDropboxAuthID(dropboxAuthID));
             performDropboxAuthentication();
+        },
+        onAuthenticateMyButtercup: myButtercupAuthID => dispatch => {
+            dispatch(setMyButtercupAuthID(myButtercupAuthID));
+            performMyButtercupAuthentication();
         },
         onChooseDropboxBasedArchive: (archiveName, masterPassword) => (dispatch, getState) => {
             const name = stripTags(archiveName);
