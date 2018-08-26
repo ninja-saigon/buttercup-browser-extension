@@ -40,7 +40,8 @@ class AddArchivePage extends PureComponent {
         onSelectRemotePath: PropTypes.func.isRequired,
         selectedArchiveType: PropTypes.string,
         selectedFilename: PropTypes.string,
-        selectedFilenameNeedsCreation: PropTypes.bool.isRequired
+        selectedFilenameNeedsCreation: PropTypes.bool.isRequired,
+        selectedMyButtercupArchives: PropTypes.arrayOf(PropTypes.number).isRequired
     };
 
     // We store some details in the state, because they're sensitive. No point
@@ -180,7 +181,9 @@ class AddArchivePage extends PureComponent {
                 <If condition={isTargetingMyButtercup && hasAuthenticatedMyButtercup}>
                     <h3>Choose Archive(s)</h3>
                     <MyButtercupArchiveChooser />
-                    <If condition={this.props.selectedFilename}>{this.renderArchiveNameInput()}</If>
+                    <If condition={this.props.selectedMyButtercupArchives.length > 0}>
+                        {this.renderArchiveNameInput()}
+                    </If>
                 </If>
             </LayoutMain>
         );

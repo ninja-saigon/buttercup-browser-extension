@@ -35,6 +35,7 @@ import { performAuthentication as performMyButtercupAuthentication } from "../li
 import { setAuthID as setDropboxAuthID } from "../../shared/actions/dropbox.js";
 import { getAuthID as getDropboxAuthID, getAuthToken as getDropboxAuthToken } from "../../shared/selectors/dropbox.js";
 import { setAuthID as setMyButtercupAuthID } from "../../shared/actions/myButtercup.js";
+import { getSelectedArchives as getSelectedMyButtercupArchives } from "../../shared/selectors/myButtercup.js";
 import {
     getAuthID as getMyButtercupAuthID,
     getAuthToken as getMyButtercupAuthToken
@@ -59,7 +60,8 @@ export default connect(
         myButtercupAuthToken: getMyButtercupAuthToken(state),
         selectedArchiveType: getSelectedArchiveType(state),
         selectedFilename: getSelectedFilename(state),
-        selectedFilenameNeedsCreation: selectedFileNeedsCreation(state)
+        selectedFilenameNeedsCreation: selectedFileNeedsCreation(state),
+        selectedMyButtercupArchives: getSelectedMyButtercupArchives(state)
     }),
     {
         onAuthenticateDesktop: code => dispatch => {
