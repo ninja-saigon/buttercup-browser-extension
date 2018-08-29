@@ -25,6 +25,7 @@ import { notifyError, notifySuccess } from "../library/notify.js";
 import {
     addDropboxArchive,
     addLocalArchive,
+    addMyButtercupArchives,
     addNextcloudArchive,
     addOwnCloudArchive,
     addWebDAVArchive
@@ -35,7 +36,11 @@ import { performAuthentication as performMyButtercupAuthentication } from "../li
 import { setAuthID as setDropboxAuthID } from "../../shared/actions/dropbox.js";
 import { getAuthID as getDropboxAuthID, getAuthToken as getDropboxAuthToken } from "../../shared/selectors/dropbox.js";
 import { setAuthID as setMyButtercupAuthID } from "../../shared/actions/myButtercup.js";
-import { getSelectedArchives as getSelectedMyButtercupArchives } from "../../shared/selectors/myButtercup.js";
+import {
+    getOrganisations,
+    getOrganisationArchives,
+    getSelectedArchives as getSelectedMyButtercupArchives
+} from "../../shared/selectors/myButtercup.js";
 import {
     getAuthID as getMyButtercupAuthID,
     getAuthToken as getMyButtercupAuthToken
@@ -145,6 +150,56 @@ export default connect(
                     notifyError(
                         "Failed selecting local vault",
                         `An error occurred when adding the vault: ${err.message}`
+                    );
+                    dispatch(setAdding(false));
+                });
+        },
+        onChooseMyButtercupArchives: masterPassword => (dispatch, getState) => {
+            const state = getState();
+            const token = getMyButtercupAuthToken(state);
+            const selectedArchives = getSelectedMyButtercupArchives(state);
+            const orgArchives = getOrganisationArchives(state);
+            const orgs = getOrganisations(state);
+            dispatch(setAdding(true));
+            dispatch(setBusy("Adding archives"));
+            return Promise.resolve()
+                .then(() => {
+                    if (selectedArchives.length <= 0) {
+                        throw new Error("No archives selected");
+                    }
+                    const selections = selectedArchives.map(archiveID => {
+                        const org = orgs.find(
+                            org => !!orgArchives[`org-${org.id}`].find(arch => arch.id === archiveID)
+                        );
+                        if (!org) {
+                            throw new Error("Failed locating organisation for selected archives");
+                        }
+                        const { id: orgID } = org;
+                        const { name } = orgArchives[`org-${orgID}`].find(arch => arch.id === archiveID);
+                        return {
+                            orgID,
+                            archiveID,
+                            name
+                        };
+                    });
+                    return addMyButtercupArchives(token, selections, masterPassword);
+                })
+                .then(() => {
+                    dispatch(unsetBusy());
+                    notifySuccess(
+                        "Successfully added archive(s)",
+                        `${selectedArchives.length} archives were successfully added.`
+                    );
+                    setTimeout(() => {
+                        closeCurrentTab();
+                    }, ADD_ARCHIVE_WINDOW_CLOSE_DELAY);
+                })
+                .catch(err => {
+                    dispatch(unsetBusy());
+                    console.error(err);
+                    notifyError(
+                        "Failed selecting My Buttercup archives",
+                        `An error occurred when adding the archive(s): ${err.message}`
                     );
                     dispatch(setAdding(false));
                 });
