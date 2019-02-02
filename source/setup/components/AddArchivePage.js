@@ -302,9 +302,7 @@ class AddArchivePage extends PureComponent {
                     <When condition={this.props.selectedArchiveType === "mybuttercup"}>
                         <Card>
                             <H4>MyButtercup</H4>
-                            <p>
-                                To start, please grant Buttercup access to your MyButtercup account.
-                            </p>
+                            <p>To start, please grant Buttercup access to your MyButtercup account.</p>
                             <Button
                                 icon="key"
                                 onClick={::this.handleMyButtercupAuth}
