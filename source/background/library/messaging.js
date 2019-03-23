@@ -1,4 +1,4 @@
-import { createArchiveFacade, createEntryFacade } from "@buttercup/facades";
+import { consumeArchiveFacade, createArchiveFacade, createEntryFacade } from "@buttercup/facades";
 import VError from "verror";
 import * as Buttercup from "../../shared/library/buttercup.js";
 import { dispatch, getState } from "../redux/index.js";
@@ -17,6 +17,7 @@ import {
     lockSources,
     openCredentialsPageForEntry,
     removeSource,
+    saveSource,
     sendCredentialsToTab,
     unlockSource
 } from "./archives.js";
@@ -70,6 +71,24 @@ function handleMessage(request, sender, sendResponse) {
                         log.info(`Authentication for Google Drive failed: Reauthenticating: ${sourceID}`);
                         reAuthGoogleDrive(sourceID, masterPassword);
                     }
+                });
+            return true;
+        }
+        case "apply-vault-facade": {
+            const { sourceID, facade } = request;
+            getArchive(sourceID)
+                .then(archive => {
+                    // const facade = createArchiveFacade(archive);
+                    consumeArchiveFacade(archive, facade);
+                    // sendResponse({ ok: true, facade });
+                    return saveSource(sourceID);
+                })
+                .then(() => {
+                    sendResponse({ ok: true });
+                })
+                .catch(err => {
+                    sendResponse({ ok: false, error: err.message });
+                    console.error(err);
                 });
             return true;
         }
